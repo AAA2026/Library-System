@@ -11,7 +11,7 @@ class Book {
     private Date borrowingDate;
 
     public Book(String name, String category) {
-        this.id = String.format("%04d", random.nextInt(10000)); // Generates a random number between 0 and 9999 as ID, with leading zeros
+        this.id = String.format("%04d", random.nextInt(10000)); 
         this.name = name;
         this.category = category;
         this.borrowed = false;
