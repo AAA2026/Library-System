@@ -8,8 +8,22 @@ public class SystemGUI {
     private Library library;
 
     public SystemGUI() {
-        library = new Library(100);
+       
+        int libraryCapacity = getLibraryCapacityFromUser();
+        library = new Library(libraryCapacity);
         createMainFrame();
+    }
+    private int getLibraryCapacityFromUser() {
+        String capacityInput = JOptionPane.showInputDialog(null, "Enter the capacity of the library:", "Welcome to our library system", JOptionPane.QUESTION_MESSAGE);
+        if (capacityInput == null) {
+            System.exit(0);
+        }
+        try {
+            return Integer.parseInt(capacityInput);
+        } catch (NumberFormatException e) {
+            JOptionPane.showMessageDialog(null, "Invalid input. Default capacity set to 100.", "Error", JOptionPane.ERROR_MESSAGE);
+            return 100;
+        }
     }
 
     private void createMainFrame() {
@@ -211,9 +225,6 @@ public class SystemGUI {
     }
 
     private static class CustomTextArea extends JTextArea {
-        /**
-		 * 
-		 */
 		private static final long serialVersionUID = 1L;
 		private static final Color BACKGROUND_COLOR = new Color(240, 240, 240);
         private static final Color BORDER_COLOR = Color.BLACK;
