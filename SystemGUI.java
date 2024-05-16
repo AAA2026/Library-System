@@ -2,6 +2,8 @@ import javax.swing.*;
 import javax.swing.border.LineBorder;
 import java.awt.*;
 import java.awt.event.ActionEvent;
+import java.io.OutputStream;
+import java.io.PrintStream;
 
 public class SystemGUI {
     private JFrame mainFrame;
@@ -211,6 +213,10 @@ public class SystemGUI {
 
         JScrollPane scrollPane = new JScrollPane(statusArea);
 
+        PrintStream printStream = new PrintStream(new CustomOutputStream(statusArea));
+        System.setOut(printStream);
+        System.setErr(printStream);
+
         library.viewStatus(statusArea);
 
         viewStatusFrame.add(scrollPane, BorderLayout.CENTER);
@@ -225,9 +231,10 @@ public class SystemGUI {
     }
 
     private static class CustomTextArea extends JTextArea {
-		private static final long serialVersionUID = 1L;
-		private static final Color BACKGROUND_COLOR = new Color(240, 240, 240);
+        private static final long serialVersionUID = 1L;
+        private static final Color BACKGROUND_COLOR = new Color(240, 240, 240);
         private static final Color BORDER_COLOR = Color.BLACK;
+        private StringBuilder buffer = new StringBuilder();
 
         public CustomTextArea() {
             setEditable(false);
@@ -240,21 +247,24 @@ public class SystemGUI {
         }
 
         @Override
-        protected void paintComponent(Graphics g) {
-            Graphics2D g2 = (Graphics2D) g.create();
-            g2.setColor(getBackground());
-            g2.fillRect(0, 0, getWidth(), getHeight());
-            
-            if (getBorder() instanceof LineBorder) {
-                LineBorder lineBorder = (LineBorder) getBorder();
-                g2.setColor(lineBorder.getLineColor());
-                g2.drawRect(0, 0, getWidth() - 1, getHeight() - 1);
-            }
-            
-            g2.dispose();
+        public synchronized void append(String str) {
+            buffer.append(str);
+            super.setText(buffer.toString());
+            super.setCaretPosition(buffer.length());
+        }
+    }
 
-            super.paintComponent(g);
+    private static class CustomOutputStream extends OutputStream {
+        private CustomTextArea textArea;
+
+        public CustomOutputStream(CustomTextArea textArea) {
+            this.textArea = textArea;
         }
 
+        @Override
+        public void write(int b) {
+            textArea.append(String.valueOf((char) b));
+        }
     }
+
 }
